@@ -1,18 +1,12 @@
-Bionova PBX call logs viewer
+Bionova PBX nginx config and cert script (use docker-prxy nginx to serve ACME requests directly to PBX and redirect PBX UCP without external IP
 
-Local env:
-pip3 install virtualenv
-virtualenv -p python3 venv
-source venv/bin/activate
-
-Docker/Portainer deployment:
-
->> We use nginx-lets-encrypt companion - so for seamless integration we need pre-create webproxy network
->> #docker network create webproxy --opt encrypted=true
-
-PROD:
-1. Copy env.dev file to env.prod. Modife variables inside env.prod
-2. Source env file
-#source env.prod
-3. Run deploy to portainer via deploy.py script
-#python deploy.py
+Deployment
+1. Copy pbx.voloshanenko.com.conf to nginx-data/conf.d
+2. Add next entry to crontab (crontab -e)
+0 * * * * cd /home/docker-proxy-companion && /bin/bash get_pbx_certificate.sh > /var/log/get_pbx_certificate.log
+3. Add next strings to /etc/rc.local
+cd /home/docker-proxy-companion && /bin/bash get_pbx_certificate.sh > /var/log/get_pbx_certificate.log
+4. Run script once
+# /bin/bash get_pbx_certificate.sh
+5. Restart docker-compose
+#docker-compose restart
